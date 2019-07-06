@@ -21,7 +21,7 @@ export class SampleBinary extends Binary
 	{
 		"outFunc";
 		"type:string";
-		"size:8";
+		"size:256";
 
 		return new Promise((accept) => {
 			process.stdin.resume();

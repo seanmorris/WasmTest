@@ -23,6 +23,7 @@ export class Binary
 			, __memory_base: 0
 			, __table_base:  0
 			, '_memset': (...args)=>{}
+			, '_memcpy': (...args)=>{}
 			, 'abort': (...args)=>{
 				console.error(args)
 			}

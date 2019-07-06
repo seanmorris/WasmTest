@@ -67,7 +67,7 @@ extern "C"
 
 	void EMSCRIPTEN_KEEPALIVE echo()
 	{
-		char str[8] = "initial";
+		char str[256] = "initial";
 
 		_get(str, [](char* res) {
 			log("2");
