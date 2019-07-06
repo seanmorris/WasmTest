@@ -1,0 +1,18 @@
+{
+	"name": "wasmtest",
+	"version": "0.0.1",
+	"description": "Minimal WASM Code.",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "babel source --presets babel-preset-latest --out-dir build",
+		"build-test": "babel source test --presets babel-preset-latest --out-dir build"
+	},
+	"author": "Sean Morris",
+	"license": "Apache-2.0",
+	"dependencies": {},
+	"devDependencies": {
+		"babel-cli": "^6.26.0",
+		"babel-minify": "^0.5.0",
+		"babel-preset-latest": "^6.24.1"
+	}
+}
