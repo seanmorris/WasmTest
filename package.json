@@ -4,8 +4,8 @@
 	"description": "Minimal WASM Code.",
 	"main": "build/index.js",
 	"scripts": {
-		"build": "babel source --presets babel-preset-latest --out-dir build",
-		"build-test": "babel source test --presets babel-preset-latest --out-dir build"
+		"build": "babel source --presets babel-preset-latest --out-dir .",
+		"build-test": "babel source test --presets babel-preset-latest --out-dir ."
 	},
 	"author": "Sean Morris",
 	"license": "Apache-2.0",

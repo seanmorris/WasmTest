@@ -1,18 +1,24 @@
-.PHONY: clean build audit
+.PHONY: clean build build-test audit audit-fix
 
-build: build/bin.wasm build/index.js
+build: Binary.js
 
-build/bin.wasm: source/*.cpp source/*.h makefile
+SampleBinary.wasm: test/*.cpp test/*.h makefile
 	@ docker run --rm -v `pwd`:`pwd` -w="`pwd`" \
 	trzeci/emscripten-slim:sdk-tag-1.38.32-64bit \
-		emcc source/*.cpp -o build/bin.wasm \
+		emcc test/*.cpp -o SampleBinary.wasm \
 		-O3 -s WASM=1 -std=c++11 -s SIDE_MODULE=1 \
 
-build/index.js: package.json source/*.js makefile
+Binary.js: package.json source/*.js makefile
 	@ docker run --rm -v `pwd`:`pwd` -w="`pwd`" \
 	node:8.16.0-alpine \
 		npm --silent install \
 		&& npm --silent run build
+
+build-test: package.json source/*.js test/*.js makefile build SampleBinary.wasm
+	@ docker run --rm -v `pwd`:`pwd` -w="`pwd`" \
+	node:8.16.0-alpine \
+		npm --silent install \
+		&& npm --silent run build-test
 
 audit: source/index.js makefile
 	@ docker run --rm -v `pwd`:`pwd` -w="`pwd`" \
@@ -25,4 +31,4 @@ audit-fix: source/index.js makefile
 		npm audit fix
 
 clean:
-	@ yes | rm build/*
+	@ rm *.js *.wasm

@@ -1,7 +1,5 @@
 import { Binary } from './Binary';
 
-// const prompt = require('prompt');
-
 export class SampleBinary extends Binary
 {
 	puts(line)
