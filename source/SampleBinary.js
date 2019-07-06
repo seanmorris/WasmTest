@@ -7,46 +7,59 @@ export class SampleBinary extends Binary
 	puts(line)
 	{
 		"outFunc";
-		"type:char *";
+		"type:string";
 
-		console.error('>> ' + line);
+		console.error('>> ', line);
 	}
 
-	_get(index, callback)
+	prInt(number)
 	{
 		"outFunc";
-		"type:char *";
+
+		console.log('>> ', number);
+	}
+
+	_get(...args)
+	{
+		"outFunc";
+		"type:string";
+		"size:8";
 
 		return new Promise((accept) => {
 			process.stdin.resume();
 			process.stdin.once('readable', () => {
 
-				const res = process.stdin.read();
-
-				// console.log(res);
-
-				accept( res );
+				accept( process.stdin.read() );
 
 			});			
 		});
 	}
 
+	_getInt(...args)
+	{
+		"outFunc"
+
+		return new Promise((accept) => {
+			setTimeout(
+				()=> accept( 1000 )
+				, 500
+			);
+		});
+
+		return 259;
+	}
+
 	echo()
 	{
 		"inFunc";
-		// "type:char *";
 	}
 
 	status(code)
 	{
 		"inFunc";
-		"type:char *";
+		"type:string";
+		"size:256";
 
 		return code;
-	}
-
-	fetch(...args)
-	{
-		console.log(args);
 	}
 }

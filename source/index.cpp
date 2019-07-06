@@ -1,12 +1,15 @@
 #include <iostream>
 #include <emscripten.h>
+#include <stdio.h>
 
 #include "./log.h"
 #include "./Test.h"
 
-// extern "C" void get(char*);
 extern "C" void _get(char*, void (*func)(char* str));
-extern "C" void fetch(char*, void (*func)());
+extern "C" void _getInt(int*, void (*func)(int* input));
+
+extern "C" void prInt(int*);
+// extern "C" void fetch(char*, void (*func)());
 
 extern "C"
 {
@@ -64,7 +67,7 @@ extern "C"
 
 	void EMSCRIPTEN_KEEPALIVE echo()
 	{
-		char str[256] = "wow!";
+		char str[8] = "initial";
 
 		_get(str, [](char* res) {
 			log("2");
@@ -75,5 +78,17 @@ extern "C"
 		log(str);
 
 		log("Input text:");
+	}
+
+	void EMSCRIPTEN_KEEPALIVE number()
+	{
+		int num   = 0;
+		int* _num = &num;
+
+		_getInt(_num, [](int* res){
+			prInt(res);
+		});
+
+		// prInt(&num);
 	}
 }

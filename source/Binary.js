@@ -2,6 +2,7 @@ const readySymbol      = Symbol('ready');
 const tableSymbol      = Symbol('table');
 const bufferSymbol     = Symbol('buffer');
 const funcTypeSymbol   = Symbol('buffer');
+const readSymbol       = Symbol('readSymbol');
 const readStringSymbol = Symbol('readString');
 
 export class Binary
@@ -14,7 +15,6 @@ export class Binary
 		const table  = new WebAssembly.Table({
 			element:   'anyfunc'
 			, initial: 256
-			// , maximum: 256
 		});
 
 		const env = {
@@ -49,64 +49,93 @@ export class Binary
 				if(this[ name.substr(1) ] instanceof Function)
 				{
 					const annotations = this[funcTypeSymbol]( this[ name.substr(1) ] );
-					let   _function   = (...args) => this[ name.substr(1) ](...args);
 
-					if(annotations.outFunc)
+					if(!annotations.outFunc)
 					{
+						return;
+					}
+
+					let _function = (...args) => this[ name.substr(1) ](...args);
+
+					_function = (index, callback = null) => {
+
+						let result;
+
 						switch(annotations.type)
 						{
-							case 'callback':
-								_function = (callback = null) => {
-									table.get(callback)();
-								};
-								break;
 							case 'string':
-							case 'char*':
-							case 'char *':
-								_function = (index, callback = null) => {
+								const param = this[readStringSymbol](buffer, index);
 
-									const param = this[readStringSymbol](buffer, index);
+								result = this[ name.substr(1) ](param);
+								break;
+							default:
+							case 'int':
+							case 'int32':
+								const slice = buffer.slice(index, index + 4);
+								const view  = new DataView(slice.buffer);
 
-									let result = this[ name.substr(1) ](param);
-
-									if(typeof result !== 'function'
-										|| !(result instanceof Promise)
-									){
-										result = Promise.resolve(result);
-									}
-
-									if(callback !== null)
-									{
-										result.then((_result)=>{
-
-											if(typeof _result === 'string')
-											{
-												for(let i = 0; i < _result.length; i++)
-												{
-													buffer[index + i] = _result.charCodeAt(i);
-												}
-
-												buffer[index +  _result.length] = 0x00;
-											}
-											else if(typeof _result === 'object'
-												&& _result instanceof Buffer
-											){
-												for(let i = 0; i < _result.length; i++)
-												{
-													buffer[index + i] = _result[i];
-												}
-
-												buffer[index +  _result.length] = 0x00;
-											}
-
-											// if(typeof _result === 'string')
-
-											table.get(callback)(index);
-										});
-									}
-								}
+								result = this[ name.substr(1) ](view.getInt32(0, true));
 								break;
 						}
+
+						if(callback === null)
+						{
+							return result;
+						}
+
+						if(typeof result !== 'function'
+							|| !(result instanceof Promise)
+						){
+							result = Promise.resolve(result);
+						}
+
+						result.then((_result)=>{
+
+							switch(annotations.type)
+							{
+								case 'string':
+									break;
+								default:
+								case 'int':
+								case 'int32':
+									let __result = _result;
+
+									_result  = new ArrayBuffer(4);
+									let view = new DataView(_result);
+
+									view.setInt32(0, __result, true);
+
+									_result  = new Int8Array(_result);
+
+									break;
+							}
+
+							let i;
+
+							for(i = 0; i < _result.length; i++)
+							{
+								if(annotations.size && i+1 >= annotations.size)
+								{
+									break;
+								}
+
+								if(typeof _result === 'string')
+								{
+									buffer[index + i] = _result.charCodeAt(i);
+								}
+								else if(typeof _result === 'object')
+								{
+									buffer[index + i] = _result[i];
+								}
+							}
+
+							if(annotations.type == 'string')
+							{
+								buffer[index +  i] = 0x00;
+							}
+
+							table.get(callback)(index);
+						});
 					}
 
 					return _function;
@@ -146,26 +175,28 @@ export class Binary
 						const annotations = this[funcTypeSymbol]( this[name] );
 						const binaryFunction = this[readySymbol].instance.exports[alias];
 
-						if(annotations.inFunc)
+						if(!annotations.inFunc)
 						{
-							switch(annotations.type)
-							{
-								case 'char *':
-									_function = (...args) => {
-										const result = binaryFunction(...args);
+							return _function;
+						}
 
-										return this[readStringSymbol](
-											buffer
-											, result
-										);
-									};
-									break;
-								default:
-									_function = (...args) => {
-										return  binaryFunction(...args);										
-									};
-									break;
-							}	
+						switch(annotations.type)
+						{
+							case 'string':
+								_function = (...args) => {
+									const result = binaryFunction(...args);
+
+									return this[readStringSymbol](
+										buffer
+										, result
+									);
+								};
+								break;
+							default:
+								_function = (...args) => {
+									return  binaryFunction(...args);
+								};
+								break;
 						}
 					}
 
