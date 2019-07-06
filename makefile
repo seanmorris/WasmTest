@@ -31,4 +31,6 @@ audit-fix: source/index.js makefile
 		npm audit fix
 
 clean:
-	@ rm *.js *.wasm
+	@ docker run --rm -v `pwd`:`pwd` -w="`pwd`" \
+		node:8.16.0-alpine \
+			rm -f *.js *.wasm
