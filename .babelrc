@@ -1,0 +1,4 @@
+{
+    "presets": [["latest"], ["minify", {"builtIns": false, "mangle": false}]],
+    "plugins": ["macros"]
+}

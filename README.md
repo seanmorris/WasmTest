@@ -28,3 +28,4 @@ $ node build/index.js
 * Passing integers & floats back and forth between JS & C++.
 * Passing strings back and forth between JS & C++.
 * Async callbacks from C++ to JS via promises.
+* Inline WASM with companion JS class.

@@ -249,7 +249,7 @@ export class Binary
 
 			let groups;
 
-			if(!(groups = line.match(/^"(.+?)(?:\:(.+?))?"$/)))
+			if(!(groups = line.match(/^['"](.+?)(?:\:(.+?))?['"]$/)))
 			{
 				break;
 			}

@@ -1,7 +1,15 @@
 import { Binary } from './Binary';
+import rawBinary  from '../rawBinary.macro';
+
+const bin = rawBinary('./test/SampleBinary.wasm');
 
 export class SampleBinary extends Binary
 {
+	constructor()
+	{
+		super(bin);
+	}
+
 	puts(line)
 	{
 		"outFunc";

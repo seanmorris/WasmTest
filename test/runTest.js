@@ -1,18 +1,8 @@
 import { SampleBinary } from './SampleBinary';
 
-const fs       = require('fs');
-const fsp      = fs.promises;
-const util     = require('util');
+const binary = new SampleBinary();
 
-const wasmFile   = './SampleBinary.wasm';
-
-let binary;
-
-fsp.readFile(wasmFile).then(bin => {
-
-	binary = new SampleBinary(bin);
-
-}).then((result) => binary.ready).then(() => {
+binary.ready.then(() => {
 
 	console.log( binary.add(8,18) );
 	console.log( binary.sub(8,18) );
@@ -25,6 +15,5 @@ fsp.readFile(wasmFile).then(bin => {
 	binary.echo();
 
 	binary.number();
-
 
 }).catch(error => console.error(error));
